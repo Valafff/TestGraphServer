@@ -1,17 +1,21 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Добавляем поддержку Newtonsoft.Json
 builder.Services.AddControllers()
-    .AddJsonOptions(options =>
+    .AddNewtonsoftJson(options =>
     {
-        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true; // Игнорировать регистр
-        options.JsonSerializerOptions.WriteIndented = true; // Форматировать JSON (опционально) чтобы не было каши в консоли
+        options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore; // Игнорировать null-значения
+        options.SerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented; // Форматировать JSON (опционально)
+        options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver
+        {
+            NamingStrategy = new Newtonsoft.Json.Serialization.CamelCaseNamingStrategy() // Использовать camelCase
+        };
     });
 
 var app = builder.Build();
-app.MapControllers();
 
+app.MapControllers();
 app.Run();
