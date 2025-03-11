@@ -12,7 +12,7 @@ namespace TestGraphServer.Controllers
     [Route("api/[controller]")]
     public class GraphController : ControllerBase
     {
-        private Graph graph = new Graph("hardCode");
+        private static Graph graph = new Graph("hardCode");
 
 
         private static int nextNodeId = 3; // Следующий Id для нового узла
@@ -49,7 +49,7 @@ namespace TestGraphServer.Controllers
             node.Ports = PortCreator(node.PortsNumber);
             //graph.Nodes.Add(node);
             graph.AddVertex(node);
-            Console.WriteLine($"Узел {node.NodeName}с Id {node.Id} добавлен в граф.");
+            Console.WriteLine($"Узел {node.NodeName} с Id {node.Id} добавлен в граф.");
             return Ok(graph);
         }
 
@@ -87,85 +87,83 @@ namespace TestGraphServer.Controllers
 
 
         [HttpPost("edgeworks")]
-        public IActionResult EdgeWorks([FromBody] EdgeDto _edge)
+        public IActionResult EdgeWorks([FromBody] EdgeDtoIdOnly _edge)
+
         {
-            if (_edge.PortSource != null && _edge.PortTarget != null)
+            //Узел источник
+            //Node sourceNode = graph.Nodes.FirstOrDefault(n => n.Id == _edge.SourceNodeId);
+            Node sourceNode = graph.Vertices.FirstOrDefault(n => n.Id == _edge.SourceId);
+            Port sourcePort = sourceNode.Ports.FirstOrDefault(p => p.Id == _edge.SourcePortId);
+
+            //Port sourcePort = _edge.PortSource;
+            //Узел приемник
+            Node targetNode = graph.Vertices.FirstOrDefault(n => n.Id == _edge.TargetId);
+            Port targetPort = targetNode.Ports.FirstOrDefault(p => p.Id == _edge.TargetPortId);
+            //Port targetPort = _edge.PortTarget;
+
+            //Проверка корректности входных данных
+            if (sourceNode == null || targetNode == null || sourcePort == null || targetPort == null)
             {
-                //Узел источник
-                //Node sourceNode = graph.Nodes.FirstOrDefault(n => n.Id == _edge.SourceNodeId);
-                Node sourceNode = graph.Vertices.FirstOrDefault(n => n.Id == _edge.SourceId);
-                Port sourcePort = sourceNode.Ports.FirstOrDefault(p => p.Id == _edge.SourcePortId);
-
-                //Port sourcePort = _edge.PortSource;
-                //Узел приемник
-                Node targetNode = graph.Vertices.FirstOrDefault(n => n.Id == _edge.TargetId);
-                Port targetPort = targetNode.Ports.FirstOrDefault(p => p.Id == _edge.TargetPortId);
-                //Port targetPort = _edge.PortTarget;
-
-                //Проверка корректности входных данных
-                if (sourceNode == null || targetNode == null || sourcePort == null || targetPort == null)
-                {
-                    Console.WriteLine("Узел или порт ребра отсутствует или задан не верно.");
-                    return BadRequest("Узел или порт ребра отсутствует или задан не верно.");
-                }
-
-                //Проверка существования ребра
-                Edge testEdge = graph.Edges.FirstOrDefault(e => e.Source.Id == _edge.SourceId
-                && e.Target.Id == _edge.SourceId
-                && e.PortSource.Id == _edge.SourcePortId
-                && e.PortTarget.Id == _edge.TargetPortId);
-
-                if (testEdge != null)
-                {
-                    Console.WriteLine("Ребро уже создано.");
-                    return BadRequest("Ребро уже создано.");
-                }
-
-                //Проверка установления связи с портами одного и того же узла
-                if (_edge.SourceId == _edge.TargetId)
-                {
-                    Console.WriteLine("Попытка установить связь между портами одного и того же узла.");
-                    return BadRequest("Попытка установить связь между портами одного и того же узла.");
-                }
-
-                //Проверка создания связи с уже занятым целевым портом
-                if (!string.IsNullOrEmpty(targetNode.Ports.FirstOrDefault(p => p.Id == _edge.TargetPortId).InputNodeName))
-                {
-                    Console.WriteLine("Целевой порт уже занят");
-                    return BadRequest("Целевой порт уже занят");
-                }
-
-                //Удаление данных о связи в старом targetPort если она была
-                if (!string.IsNullOrEmpty(sourcePort.InputNodeName))
-                {
-                    Edge temp = graph.Edges.FirstOrDefault(e => e.PortSource.Id == sourcePort.Id || e.PortTarget.Id == sourcePort.Id);
-                    temp.PortSource.InputPortNumber = 0;
-                    temp.PortSource.InputNodeName = null;
-                    temp.PortTarget.InputPortNumber = 0;
-                    temp.PortTarget.InputNodeName = null;
-                    graph.RemoveEdge(temp);
-                }
-
-                sourcePort.InputPortNumber = targetPort.Id;
-                sourcePort.InputNodeName = targetNode.NodeName;
-                targetPort.InputPortNumber = sourcePort.Id;
-                targetPort.InputNodeName = sourceNode.NodeName;
-
-                //Cоздание/редактирование ребра
-                var newEdge = new Edge(sourceNode, targetNode)
-                {
-                    Id = nextEdgeId++,
-                    PortSource = sourcePort,
-                    PortTarget = targetPort
-                };
-
-                graph.AddEdge(newEdge);
-                Console.WriteLine($"Ребро создано между узлом {sourceNode.NodeName} портом {sourcePort.Id} и узлом {targetNode.NodeName} портом {targetPort.Id}.");
-                Console.WriteLine($"Порт источник содержит: связанный порт {newEdge.PortSource.InputPortNumber} имя связанного узла {newEdge.PortSource.InputNodeName}");
-                Console.WriteLine($"Порт приемник содержит: связанный порт {newEdge.PortTarget.InputPortNumber} имя связанного узла {newEdge.PortSource.InputNodeName}");
-                return Ok(graph);
+                Console.WriteLine("Узел или порт ребра отсутствует или задан не верно.");
+                return BadRequest("Узел или порт ребра отсутствует или задан не верно.");
             }
-            return BadRequest("Ошибка создания ребра");
+
+            //Проверка существования ребра
+            Edge testEdge = graph.Edges.FirstOrDefault(e => e.Source.Id == _edge.SourceId
+            && e.Target.Id == _edge.TargetId
+            && e.PortSource.Id == _edge.SourcePortId
+            && e.PortTarget.Id == _edge.TargetPortId);
+
+            if (testEdge != null)
+            {
+                Console.WriteLine("Ребро уже создано.");
+                return BadRequest("Ребро уже создано.");
+            }
+
+            //Проверка установления связи с портами одного и того же узла
+            if (_edge.SourceId == _edge.TargetId)
+            {
+                Console.WriteLine("Попытка установить связь между портами одного и того же узла.");
+                return BadRequest("Попытка установить связь между портами одного и того же узла.");
+            }
+
+            //Проверка создания связи с уже занятым целевым портом
+            if (!string.IsNullOrEmpty(targetNode.Ports.FirstOrDefault(p => p.Id == _edge.TargetPortId).InputNodeName))
+            {
+                Console.WriteLine("Целевой порт уже занят");
+                return BadRequest("Целевой порт уже занят");
+            }
+
+            //Удаление данных о связи в старом targetPort если она была
+            if (!string.IsNullOrEmpty(sourcePort.InputNodeName))
+            {
+                Edge temp = graph.Edges.FirstOrDefault(e => e.PortSource.Id == sourcePort.Id || e.PortTarget.Id == sourcePort.Id);
+                temp.PortSource.InputPortNumber = 0;
+                temp.PortSource.InputNodeName = null;
+                temp.PortTarget.InputPortNumber = 0;
+                temp.PortTarget.InputNodeName = null;
+                graph.RemoveEdge(temp);
+            }
+
+            sourcePort.InputPortNumber = targetPort.Id;
+            sourcePort.InputNodeName = targetNode.NodeName;
+            targetPort.InputPortNumber = sourcePort.Id;
+            targetPort.InputNodeName = sourceNode.NodeName;
+
+            //Cоздание/редактирование ребра
+            var newEdge = new Edge(sourceNode, targetNode)
+            {
+                Id = nextEdgeId++,
+                PortSource = sourcePort,
+                PortTarget = targetPort
+            };
+
+            graph.AddEdge(newEdge);
+            Console.WriteLine($"Ребро создано между узлом {sourceNode.NodeName} портом {sourcePort.Id} и узлом {targetNode.NodeName} портом {targetPort.Id}.");
+            Console.WriteLine($"Порт источник содержит: связанный порт {newEdge.PortSource.InputPortNumber} имя связанного узла {newEdge.PortSource.InputNodeName}");
+            Console.WriteLine($"Порт приемник содержит: связанный порт {newEdge.PortTarget.InputPortNumber} имя связанного узла {newEdge.PortSource.InputNodeName}");
+            return Ok(graph);
+
         }
 
         [HttpDelete("deleteedge/{edgeId}")]
