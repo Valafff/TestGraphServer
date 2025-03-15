@@ -5,6 +5,7 @@ using System.Xml.Linq;
 using TestGraphModel;
 using QuikGraph;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace TestGraphServer.Controllers
 {
@@ -34,6 +35,28 @@ namespace TestGraphServer.Controllers
             Console.WriteLine("Граф отправлен клиенту.");
             return Ok(graph);
         }
+
+        //Отправка состояния графа передаваемое клиентом
+        [HttpPost("setgraphstate")] 
+        public IActionResult SetGraphState([FromBody] string _graph)
+        {
+            if (_graph == null)
+            {
+                return BadRequest("Граф не может быть null.");
+            }
+            GraphDtoToGrath(_graph, ref graph, out bool _error);
+            if (!_error)
+            {
+                Console.WriteLine("Граф получен от клиента.");
+                return Ok();
+            }
+            else
+            {
+                Console.WriteLine("Ошибка получения графа.");
+                return BadRequest();
+            }
+        }
+
 
         [HttpPost("createnode")]
         public IActionResult CreateNode([FromBody] Node node)
@@ -202,6 +225,65 @@ namespace TestGraphServer.Controllers
                 tempPorts.Add(port);
             }
             return tempPorts;
+        }
+
+        void GraphDtoToGrath(string _content, ref Graph _graph, out bool _error)
+        {
+            try
+            {
+                if (_graph != null)
+                {
+                    _graph.Clear();
+                }
+                var settings = new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore, // Игнорировать null-значения
+                    MissingMemberHandling = MissingMemberHandling.Ignore, // Игнорировать отсутствующие свойства
+                    ContractResolver = new CamelCasePropertyNamesContractResolver() // Использовать camelCase
+                };
+                var graphDto = JsonConvert.DeserializeObject<GraphDto>(_content);
+                // Добавление узлов в граф
+                foreach (var nodeDto in graphDto.Vertices)
+                {
+                    Node node = new Node
+                    {
+                        Id = nodeDto.Id,
+                        PortsNumber = nodeDto.PortsNumber,
+                        NodeName = nodeDto.NodeName,
+                        X = nodeDto.X,
+                        Y = nodeDto.Y,
+                        SimpleData = new NodeData(),
+                        Ports = nodeDto.Ports.Select(p => new Port
+                        {
+                            Id = p.Id,
+                            LocalId = p.LocalId,
+                            InputPortNumber = p.InputPortNumber,
+                            IsLeftSidePort = p.IsLeftSidePort
+                        }).ToList()
+                    };
+
+                    _graph.AddVertex(node);
+                }
+
+                // Добавление ребер в граф
+                foreach (var edgeDto in graphDto.Edges)
+                {
+                    var sourceNode = _graph.Vertices.FirstOrDefault(n => n.Id == edgeDto.Source.Id);
+                    var targetNode = _graph.Vertices.FirstOrDefault(n => n.Id == edgeDto.Target.Id);
+
+                    if (sourceNode != null && targetNode != null)
+                    {
+                        var edge = new Edge(sourceNode, targetNode);
+                        _graph.AddEdge(edge);
+                    }
+                }
+                _error = false;
+            }
+            catch (System.Text.Json.JsonException ex)
+            {
+                _error = true;
+                throw;
+            }
         }
     }
 }

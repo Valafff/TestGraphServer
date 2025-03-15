@@ -3,12 +3,17 @@ namespace TestGraphModel
 {
     public class Graph : BidirectionalGraph<Node, Edge>
     {
+        //Добавлены как второстепенные поля
+        public int Id { get; set; }
+        public string GraphName { get; set; }
         // Конструктор по умолчанию
         public Graph() : base() { }
 
         // Для тестов
         public Graph(string _test) : base()
         {
+            Id = 0;
+            GraphName = "TestGraph";
             Node n1 = new Node
             {
                 Id = 1,
@@ -45,9 +50,11 @@ namespace TestGraphModel
     {
         public int Id { get; set; }
         public int PortsNumber { get; set; }
-        public  string NodeName { get; set; }
-        public  NodeData SimpleData { get; set; }
+        public string NodeName { get; set; }
+        public NodeData SimpleData { get; set; }
         public List<Port> Ports { get; set; } = new List<Port>();
+        public double X { get; set; }
+        public double Y { get; set; }
     }
 
 
@@ -67,8 +74,8 @@ namespace TestGraphModel
         public int Id { get; set; }
         public Node Source { get; set; } = source;
         public Node Target { get; set; } = target;
-        public  Port PortSource { get; set; }
-        public  Port PortTarget { get; set; }
+        public Port PortSource { get; set; }
+        public Port PortTarget { get; set; }
     }
 
     public class NodeData
@@ -87,8 +94,10 @@ namespace TestGraphModel
     {
         public int Id { get; set; }
         public int PortsNumber { get; set; }
-        public  string NodeName { get; set; }
-        public  NodeDataDto SimpleData { get; set; }
+        public string NodeName { get; set; }
+        public double X { get; set; }
+        public double Y { get; set; }
+        public NodeDataDto SimpleData { get; set; }
         public List<PortDto> Ports { get; set; } = new List<PortDto>();
     }
 
@@ -104,19 +113,19 @@ namespace TestGraphModel
     public class EdgeDto
     {
         public int Id { get; set; }
-        public NodeDto Source { get; set; } 
-        public NodeDto Target { get; set; } 
-        public PortDto PortSource { get; set; } 
-        public PortDto PortTarget { get; set; } 
+        public NodeDto Source { get; set; }
+        public NodeDto Target { get; set; }
+        public PortDto PortSource { get; set; }
+        public PortDto PortTarget { get; set; }
     }
 
     public class EdgeDtoIdOnly
     {
         public int Id { get; set; }
-        public int SourceId { get; set; } 
-        public int TargetId { get; set; } 
-        public int SourcePortId { get; set; } 
-        public int TargetPortId { get; set; } 
+        public int SourceId { get; set; }
+        public int TargetId { get; set; }
+        public int SourcePortId { get; set; }
+        public int TargetPortId { get; set; }
     }
 
     public class NodeDataDto

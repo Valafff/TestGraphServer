@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Добавляем поддержку Newtonsoft.Json
 builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
     {
