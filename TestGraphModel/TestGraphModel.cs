@@ -18,12 +18,12 @@ namespace TestGraphModel
             {
                 Id = 1,
                 NodeName = "Node1",
-                SimpleData = new NodeData(),
+                SimpleData = new NodeData() { SomeText = "Хардкод1", SomeValue = 42 },
                 Ports = new List<Port>
             {
-                new Port { Id = 1, InputPortNumber = 0 },
-                new Port { Id = 2, InputPortNumber = 0 },
-                new Port { Id = 3, InputPortNumber = 0 }
+                new Port { Id = 1, InputPortNumber = 1, IsLeftSidePort = false },
+                new Port { Id = 2, InputPortNumber = 2 , IsLeftSidePort = true },
+                new Port { Id = 3, InputPortNumber = 3, IsLeftSidePort = false }
             }
             };
 
@@ -31,13 +31,13 @@ namespace TestGraphModel
             {
                 Id = 2,
                 NodeName = "Node2",
-                SimpleData = new NodeData(),
+                SimpleData = new NodeData() {SomeText = "Хардкод2", SomeValue = 888},
                 Ports = new List<Port>
             {
-                new Port { Id = 4, InputPortNumber = 0 },
-                new Port { Id = 5, InputPortNumber = 0 },
-                new Port { Id = 6, InputPortNumber = 0 },
-                new Port { Id = 7, InputPortNumber = 0 }
+                new Port { Id = 4, InputPortNumber = 1, IsLeftSidePort = false},
+                new Port { Id = 5, InputPortNumber = 2, IsLeftSidePort = true},
+                new Port { Id = 6, InputPortNumber = 3, IsLeftSidePort = false},
+                new Port { Id = 7, InputPortNumber = 4, IsLeftSidePort = true}
             }
             };
 

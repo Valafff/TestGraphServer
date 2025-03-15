@@ -252,7 +252,7 @@ namespace TestGraphServer.Controllers
                         NodeName = nodeDto.NodeName,
                         X = nodeDto.X,
                         Y = nodeDto.Y,
-                        SimpleData = new NodeData(),
+                        SimpleData = new NodeData() { SomeText = nodeDto.SimpleData.SomeText, SomeValue = nodeDto.SimpleData.SomeValue },
                         Ports = nodeDto.Ports.Select(p => new Port
                         {
                             Id = p.Id,
