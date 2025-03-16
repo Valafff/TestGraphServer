@@ -69,7 +69,10 @@ namespace TestGraphServer.Controllers
             }
 
             node.Id = nextNodeId++;
-            node.Ports = PortCreator(node.PortsNumber);
+            if (node.Ports.Count == 0)
+            {
+                node.Ports = PortCreator(node.PortsNumber);
+            }
             //graph.Nodes.Add(node);
             graph.AddVertex(node);
             Console.WriteLine($"Узел {node.NodeName} с Id {node.Id} добавлен в граф.");
