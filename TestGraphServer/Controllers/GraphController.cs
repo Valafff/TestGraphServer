@@ -73,6 +73,13 @@ namespace TestGraphServer.Controllers
             {
                 node.Ports = PortCreator(node.PortsNumber);
             }
+            else
+            {
+                foreach(var port in node.Ports)
+                {
+                    port.Id = nextPortId++;
+                }
+            }
             //graph.Nodes.Add(node);
             graph.AddVertex(node);
             Console.WriteLine($"Узел {node.NodeName} с Id {node.Id} добавлен в граф.");
@@ -201,7 +208,10 @@ namespace TestGraphServer.Controllers
                 Console.WriteLine($"Ребро с id {edgeId} не найдено.");
                 return NotFound("Ребро не найдено.");
             }
-
+            edge.PortSource.InputNodeName = "";
+            edge.PortTarget.InputNodeName = "";
+            edge.PortSource.InputPortNumber = 0;
+            edge.PortTarget.InputPortNumber = 0;
             graph.RemoveEdge(edge);
             Console.WriteLine($"Ребро с id {edgeId} удалено.");
             return Ok(graph);

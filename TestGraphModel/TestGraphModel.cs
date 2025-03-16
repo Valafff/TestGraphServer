@@ -23,9 +23,9 @@ namespace TestGraphModel
                 Y = 100,
                 Ports = new List<Port>
             {
-                new Port { Id = 1, InputPortNumber = 1, IsLeftSidePort = false },
-                new Port { Id = 2, InputPortNumber = 2 , IsLeftSidePort = true },
-                new Port { Id = 3, InputPortNumber = 3, IsLeftSidePort = false }
+                new Port { Id = 1, InputPortNumber = 1, IsLeftSidePort = false, LocalId = 1 },
+                new Port { Id = 2, InputPortNumber = 2 , IsLeftSidePort = true, LocalId = 2 },
+                new Port { Id = 3, InputPortNumber = 3, IsLeftSidePort = false, LocalId = 3 }
             }
             };
 
@@ -38,10 +38,10 @@ namespace TestGraphModel
                 Y = 300,
                 Ports = new List<Port>
             {
-                new Port { Id = 4, InputPortNumber = 1, IsLeftSidePort = false},
-                new Port { Id = 5, InputPortNumber = 2, IsLeftSidePort = true},
-                new Port { Id = 6, InputPortNumber = 3, IsLeftSidePort = false},
-                new Port { Id = 7, InputPortNumber = 4, IsLeftSidePort = true}
+                new Port { Id = 4, InputPortNumber = 1, IsLeftSidePort = false, LocalId = 1},
+                new Port { Id = 5, InputPortNumber = 2, IsLeftSidePort = true, LocalId = 2},
+                new Port { Id = 6, InputPortNumber = 3, IsLeftSidePort = false, LocalId = 3},
+                new Port { Id = 7, InputPortNumber = 4, IsLeftSidePort = true, LocalId = 4}
             }
             };
 
