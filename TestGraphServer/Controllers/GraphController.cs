@@ -166,11 +166,14 @@ namespace TestGraphServer.Controllers
             if (!string.IsNullOrEmpty(sourcePort.InputNodeName))
             {
                 Edge temp = graph.Edges.FirstOrDefault(e => e.PortSource.Id == sourcePort.Id || e.PortTarget.Id == sourcePort.Id);
-                temp.PortSource.InputPortNumber = 0;
-                temp.PortSource.InputNodeName = null;
-                temp.PortTarget.InputPortNumber = 0;
-                temp.PortTarget.InputNodeName = null;
-                graph.RemoveEdge(temp);
+                if (temp != null)
+                {
+                    temp.PortSource.InputPortNumber = 0;
+                    temp.PortSource.InputNodeName = null;
+                    temp.PortTarget.InputPortNumber = 0;
+                    temp.PortTarget.InputNodeName = null;
+                    graph.RemoveEdge(temp);
+                }
             }
 
             sourcePort.InputPortNumber = targetPort.Id;
