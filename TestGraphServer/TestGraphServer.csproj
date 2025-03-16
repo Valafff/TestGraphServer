@@ -16,4 +16,10 @@
     <ProjectReference Include="..\TestGraphModel\TestGraphModel.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="TestGraphModel.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

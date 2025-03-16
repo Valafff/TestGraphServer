@@ -138,6 +138,10 @@ namespace TestGraphModel
         public double Y_source { get; set; }
         public double X_target { get; set; }
         public double Y_target { get; set; }
+        public string? InputToSourcePort { get; set; }
+        public string? InputToTargetPort { get; set; }
+        public int InputToSourceNumber { get; set; }
+        public int InputToTargetNumber { get; set; }
     }
 
     public class NodeDataDto

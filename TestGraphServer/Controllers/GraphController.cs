@@ -1,9 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Linq;
 using TestGraphModel;
-using QuikGraph;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -13,8 +9,7 @@ namespace TestGraphServer.Controllers
     [Route("api/[controller]")]
     public class GraphController : ControllerBase
     {
-        private static Graph graph = new Graph("hardCode");
-
+        private static Graph graph = new Graph("Test");
 
         private static int nextNodeId = 3; // Следующий Id для нового узла
         private static int nextPortId = 8; // Следующий Id для нового порта
@@ -28,7 +23,7 @@ namespace TestGraphServer.Controllers
             return Ok("pong");
         }
 
-        //Отправка модели графа клиенту при первом подключении
+        //Отправка модели графа клиенту при подключении
         [HttpGet("sendgraph")]
         public IActionResult SendGraph()
         {
@@ -80,7 +75,6 @@ namespace TestGraphServer.Controllers
                     port.Id = nextPortId++;
                 }
             }
-            //graph.Nodes.Add(node);
             graph.AddVertex(node);
             Console.WriteLine($"Узел {node.NodeName} с Id {node.Id} добавлен в граф.");
             return Ok(graph);
@@ -90,7 +84,6 @@ namespace TestGraphServer.Controllers
         public IActionResult EditNode([FromBody] Node newNode)
         {
             //проверка существования узла с заданным именем
-            //Node editNode = graph.Nodes.FirstOrDefault(n => n.Id == newNode.Id);
             Node editNode = graph.Vertices.FirstOrDefault(n => n.Id == newNode.Id);
             if (editNode == null)
             {
@@ -124,17 +117,39 @@ namespace TestGraphServer.Controllers
 
         {
             //Узел источник
-            //Node sourceNode = graph.Nodes.FirstOrDefault(n => n.Id == _edge.SourceNodeId);
             Node sourceNode = graph.Vertices.FirstOrDefault(n => n.Id == _edge.SourceId);
             Port sourcePort = sourceNode.Ports.FirstOrDefault(p => p.Id == _edge.SourcePortId);
             sourcePort.X = _edge.X_source;
             sourcePort.Y = _edge.Y_source;
+            sourcePort.InputNodeName = _edge.InputToSourcePort;
+            sourcePort.InputPortNumber = _edge.InputToSourceNumber;
+            var edg = graph.Edges.FirstOrDefault(e => e.PortTarget.Id == sourcePort.Id);
+            if (string.IsNullOrEmpty(sourcePort.InputNodeName) && edg != null)
+            {
+                sourcePort.InputNodeName = edg.PortSource.InputNodeName;
+            }
+            if (sourcePort.InputPortNumber == 0 && edg != null)
+            {
+                sourcePort.InputPortNumber = edg.PortSource.InputPortNumber;
+            }
+
 
             //Узел приемник
             Node targetNode = graph.Vertices.FirstOrDefault(n => n.Id == _edge.TargetId);
             Port targetPort = targetNode.Ports.FirstOrDefault(p => p.Id == _edge.TargetPortId);
             targetPort.X = _edge.X_target;
             targetPort.Y = _edge.Y_target;
+            targetPort.InputNodeName = _edge.InputToTargetPort;
+            targetPort.InputPortNumber = _edge.InputToTargetNumber;
+            edg = graph.Edges.FirstOrDefault(e => e.PortTarget.Id == targetPort.Id);
+            if (string.IsNullOrEmpty(targetPort.InputNodeName) && edg != null)
+            {
+                targetPort.InputNodeName = edg.PortTarget.InputNodeName;
+            }
+            if (targetPort.InputPortNumber == 0 && edg != null)
+            {
+                targetPort.InputPortNumber = edg.PortTarget.InputPortNumber;
+            }
 
             //Проверка корректности входных данных
             if (sourceNode == null || targetNode == null || sourcePort == null || targetPort == null)
@@ -162,6 +177,12 @@ namespace TestGraphServer.Controllers
                 return BadRequest("Попытка установить связь между портами одного и того же узла.");
             }
 
+            ////Проверка создания связи с уже занятым целевым портом
+            //if (!string.IsNullOrEmpty(targetNode.Ports.FirstOrDefault(p => p.Id == _edge.TargetPortId).InputNodeName) && targetPort.InputPortNumber != 0)
+            //{
+            //    Console.WriteLine("Целевой порт уже занят");
+            //    return BadRequest("Целевой порт уже занят");
+            //}
             //Проверка создания связи с уже занятым целевым портом
             if (!string.IsNullOrEmpty(targetNode.Ports.FirstOrDefault(p => p.Id == _edge.TargetPortId).InputNodeName))
             {
@@ -220,8 +241,6 @@ namespace TestGraphServer.Controllers
         List<Port> PortCreator(int _portsCount)
         {
             List<Port> tempPorts = new List<Port>();
-            // Назначаем Id портам
-            //_ports.ForEach(p =>  p.Id = _nextPortId++);
             int localId = 1;
             while (_portsCount-- > 0)
             {
@@ -271,6 +290,7 @@ namespace TestGraphServer.Controllers
                             Id = p.Id,
                             LocalId = p.LocalId,
                             InputPortNumber = p.InputPortNumber,
+                            InputNodeName = p.InputNodeName,
                             IsLeftSidePort = p.IsLeftSidePort,
                             X = p.X,
                             Y = p.Y
