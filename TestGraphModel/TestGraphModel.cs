@@ -19,6 +19,8 @@ namespace TestGraphModel
                 Id = 1,
                 NodeName = "Node1",
                 SimpleData = new NodeData() { SomeText = "Хардкод1", SomeValue = 42 },
+                X = 100,
+                Y = 100,
                 Ports = new List<Port>
             {
                 new Port { Id = 1, InputPortNumber = 1, IsLeftSidePort = false },
@@ -31,7 +33,9 @@ namespace TestGraphModel
             {
                 Id = 2,
                 NodeName = "Node2",
-                SimpleData = new NodeData() {SomeText = "Хардкод2", SomeValue = 888},
+                SimpleData = new NodeData() { SomeText = "Хардкод2", SomeValue = 888 },
+                X = 300,
+                Y = 300,
                 Ports = new List<Port>
             {
                 new Port { Id = 4, InputPortNumber = 1, IsLeftSidePort = false},
