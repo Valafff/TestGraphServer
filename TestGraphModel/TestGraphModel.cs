@@ -73,13 +73,13 @@ namespace TestGraphModel
 
 
 
-    public class Edge(Node source, Node target) : IEdge<Node>
+    public class Edge(int _id, Node source, Node target, Port portSource, Port portTarget) : IEdge<Node>
     {
-        public int Id { get; set; }
+        public int Id { get; set; } = _id;
         public Node Source { get; set; } = source;
         public Node Target { get; set; } = target;
-        public Port PortSource { get; set; }
-        public Port PortTarget { get; set; }
+        public Port PortSource { get; set; } = portSource;
+        public Port PortTarget { get; set; } = portTarget;
     }
 
     public class NodeData

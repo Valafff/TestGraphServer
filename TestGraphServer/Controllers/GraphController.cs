@@ -36,7 +36,7 @@ namespace TestGraphServer.Controllers
             return Ok(graph);
         }
 
-        //Отправка состояния графа передаваемое клиентом
+        //Получение состояния графа передаваемое клиентом
         [HttpPost("setgraphstate")] 
         public IActionResult SetGraphState([FromBody] string _graph)
         {
@@ -177,12 +177,7 @@ namespace TestGraphServer.Controllers
             targetPort.InputNodeName = sourceNode.NodeName;
 
             //Cоздание/редактирование ребра
-            var newEdge = new Edge(sourceNode, targetNode)
-            {
-                Id = nextEdgeId++,
-                PortSource = sourcePort,
-                PortTarget = targetPort
-            };
+            var newEdge = new Edge(nextEdgeId++, sourceNode, targetNode, sourcePort, targetPort);
 
             graph.AddEdge(newEdge);
             Console.WriteLine($"Ребро создано между узлом {sourceNode.NodeName} портом {sourcePort.Id} и узлом {targetNode.NodeName} портом {targetPort.Id}.");
@@ -273,10 +268,28 @@ namespace TestGraphServer.Controllers
                 {
                     var sourceNode = _graph.Vertices.FirstOrDefault(n => n.Id == edgeDto.Source.Id);
                     var targetNode = _graph.Vertices.FirstOrDefault(n => n.Id == edgeDto.Target.Id);
-
-                    if (sourceNode != null && targetNode != null)
+                    var sourcePortDto = (graphDto.Edges.FirstOrDefault(p => p.PortSource.Id == edgeDto.PortSource.Id)).PortSource;
+                    var targetPortDto = (graphDto.Edges.FirstOrDefault(p => p.PortTarget.Id == edgeDto.PortTarget.Id)).PortTarget;
+                    Port sourcePort = new Port()
                     {
-                        var edge = new Edge(sourceNode, targetNode);
+                        Id = sourcePortDto.Id,
+                        LocalId = sourcePortDto.LocalId,
+                        InputPortNumber = sourcePortDto.InputPortNumber,
+                        InputNodeName = sourcePortDto.InputNodeName,
+                        IsLeftSidePort = sourcePortDto.IsLeftSidePort
+                    };
+                    Port targetPort = new Port()
+                    {
+                        Id = targetPortDto.Id,
+                        LocalId = targetPortDto.LocalId,
+                        InputPortNumber = targetPortDto.InputPortNumber,
+                        InputNodeName = targetPortDto.InputNodeName,
+                        IsLeftSidePort = targetPortDto.IsLeftSidePort
+                    };
+
+                    if (sourceNode != null && targetNode != null && sourcePort != null && targetPort != null)
+                    {
+                        var edge = new Edge(edgeDto.Id, sourceNode, targetNode, sourcePort, targetPort);
                         _graph.AddEdge(edge);
                     }
                 }
