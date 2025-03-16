@@ -69,6 +69,8 @@ namespace TestGraphModel
         public int InputPortNumber { get; set; }
         public string? InputNodeName { get; set; }
         public bool IsLeftSidePort { get; set; }
+        public double X { get; set; }
+        public double Y { get; set; }
     }
 
 
@@ -112,6 +114,8 @@ namespace TestGraphModel
         public int InputPortNumber { get; set; }
         public string? InputNodeName { get; set; }
         public bool IsLeftSidePort { get; set; }
+        public double X { get; set; }
+        public double Y { get; set; }
     }
 
     public class EdgeDto
@@ -130,6 +134,10 @@ namespace TestGraphModel
         public int TargetId { get; set; }
         public int SourcePortId { get; set; }
         public int TargetPortId { get; set; }
+        public double X_source { get; set; }
+        public double Y_source { get; set; }
+        public double X_target { get; set; }
+        public double Y_target { get; set; }
     }
 
     public class NodeDataDto

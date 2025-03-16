@@ -120,12 +120,14 @@ namespace TestGraphServer.Controllers
             //Node sourceNode = graph.Nodes.FirstOrDefault(n => n.Id == _edge.SourceNodeId);
             Node sourceNode = graph.Vertices.FirstOrDefault(n => n.Id == _edge.SourceId);
             Port sourcePort = sourceNode.Ports.FirstOrDefault(p => p.Id == _edge.SourcePortId);
+            sourcePort.X = _edge.X_source;
+            sourcePort.Y = _edge.Y_source;
 
-            //Port sourcePort = _edge.PortSource;
             //Узел приемник
             Node targetNode = graph.Vertices.FirstOrDefault(n => n.Id == _edge.TargetId);
             Port targetPort = targetNode.Ports.FirstOrDefault(p => p.Id == _edge.TargetPortId);
-            //Port targetPort = _edge.PortTarget;
+            targetPort.X = _edge.X_target;
+            targetPort.Y = _edge.Y_target;
 
             //Проверка корректности входных данных
             if (sourceNode == null || targetNode == null || sourcePort == null || targetPort == null)
@@ -256,7 +258,9 @@ namespace TestGraphServer.Controllers
                             Id = p.Id,
                             LocalId = p.LocalId,
                             InputPortNumber = p.InputPortNumber,
-                            IsLeftSidePort = p.IsLeftSidePort
+                            IsLeftSidePort = p.IsLeftSidePort,
+                            X = p.X,
+                            Y = p.Y
                         }).ToList()
                     };
 
@@ -276,7 +280,10 @@ namespace TestGraphServer.Controllers
                         LocalId = sourcePortDto.LocalId,
                         InputPortNumber = sourcePortDto.InputPortNumber,
                         InputNodeName = sourcePortDto.InputNodeName,
-                        IsLeftSidePort = sourcePortDto.IsLeftSidePort
+                        IsLeftSidePort = sourcePortDto.IsLeftSidePort,
+                        X = sourcePortDto.X,
+                        Y = sourcePortDto.Y
+
                     };
                     Port targetPort = new Port()
                     {
@@ -284,7 +291,9 @@ namespace TestGraphServer.Controllers
                         LocalId = targetPortDto.LocalId,
                         InputPortNumber = targetPortDto.InputPortNumber,
                         InputNodeName = targetPortDto.InputNodeName,
-                        IsLeftSidePort = targetPortDto.IsLeftSidePort
+                        IsLeftSidePort = targetPortDto.IsLeftSidePort,
+                        X = targetPortDto.X,
+                        Y = targetPortDto.Y
                     };
 
                     if (sourceNode != null && targetNode != null && sourcePort != null && targetPort != null)
